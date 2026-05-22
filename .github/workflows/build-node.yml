@@ -69,7 +69,8 @@ jobs:
         run: |
           cd ${{ inputs.source-path }}
           dir
-          aws s3 rm s3://amzn-s3-front-test
+          aws s3 ls s3://amzn-s3-front-test
+          aws s3 rm s3://amzn-s3-front-test --recursive
           aws sync . s3://amzn-s3-front-test
           aws s3 ls s3://amzn-s3-front-test
 
