@@ -17,3 +17,4 @@ runs:
         Push-Location ${{ inputs.source }}
         Compress-Archive -Path * -DestinationPath $env:GITHUB_WORKSPACE/${{ inputs.output }}
         Pop-Location
+        Write-Host "Tarea finalizada"
