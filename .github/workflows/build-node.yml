@@ -1,0 +1,56 @@
+name: ResusableWorkflow
+
+on:
+  workflow_call:
+    inputs:
+      versionnode:
+        description: "Version de node"
+        required: true
+        type: string
+      app-name-zip:
+        description: "Nombre de la aplicacion"
+        required: true
+        type: string
+      app-name:
+        description: "Nombre de la aplicacion"
+        required: true
+        type: string        
+      source-path:
+        description: "Carpeta de archivos del build"
+        required: true
+        type: string  
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setear version de node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.versionnode }}
+
+      - name: Restore
+        run: |
+          npm install -g @angular/cli
+          npm install
+
+      - name: build
+        run: ng build --configuration production   
+
+      - name: Comprimir con powershell
+        shell: pwsh
+        run: |
+          if (Test-Path ${{ inputs.app-name-zip }}) { Remove-Item ${{ inputs.app-name-zip }} -Force }
+          Push-Location ${{ inputs.source-path }}
+          Compress-Archive -Path * -DestinationPath $env:GITHUB_WORKSPACE/${{ inputs.app-name-zip }}
+          Pop-Location
+          Write-Host "Tarea finalizada"
+
+      - name: Publicar artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.app-name }}
+          path: ${{ inputs.app-name-zip }}
+
