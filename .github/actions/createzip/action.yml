@@ -1,0 +1,19 @@
+name: "Crear zip con powershell"
+description: "Comprime archivos"
+inputs:
+  source:
+    description: "Ruta de los archivos a comprimir"
+    required: true
+  output:
+    description: "Nombre del archivo zip de salida"
+    default: "app.zip"
+runs:
+  using: "composite"
+  steps:
+    - name: Comprimir con powershell
+      shell: pwsh
+      run: |
+        if (Test-Path ${{ inputs.output }}) { Remove-Item ${{ inputs.output }} -Force }
+        Push-Location ${{ inputs.source }}
+        Compress-Archive -Path * -DestinationPath $env:GITHUB_WORKSPACE/${{ inputs.output }}
+        Pop-Location
